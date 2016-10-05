@@ -11,8 +11,9 @@ RUN cd /opt && \
   tar -xvf riemann-0.2.11.tar.bz2 && \
   rm -rf riemann-0.2.11.tar.bz2 && \
   mv riemann-0.2.11 riemann
+ADD etc/riemann.config /etc/riemann/riemann.config
 USER riemann
 EXPOSE 5555
 EXPOSE 5555/udp
 EXPOSE 5556
-ENTRYPOINT ["/opt/riemann/bin/riemann", "-a", "-Xmx1024m"]
+ENTRYPOINT ["/opt/riemann/bin/riemann", "-a", "-Xmx1024m", "/etc/riemann/riemann.config"]
