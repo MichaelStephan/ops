@@ -71,7 +71,7 @@ public class App {
         }
 
         /* jvm profiler, this is a bit dirty ;) */
-//        startJVMProfiler();
+        startJVMProfiler();
 
         /* services */
         SimulatorService simulatorService = new SimulatorService(registry);
