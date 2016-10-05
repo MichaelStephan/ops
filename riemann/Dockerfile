@@ -13,5 +13,6 @@ RUN cd /opt && \
   mv riemann-0.2.11 riemann
 USER riemann
 EXPOSE 5555
+EXPOSE 5555/udp
 EXPOSE 5556
 ENTRYPOINT ["/opt/riemann/bin/riemann", "-a", "-Xmx1024m"]
