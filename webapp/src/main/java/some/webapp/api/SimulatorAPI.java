@@ -1,6 +1,6 @@
 package some.webapp.api;
 
-import some.webapp.service.HelloWorldService;
+import some.webapp.service.SimulatorService;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -12,20 +12,20 @@ import javax.ws.rs.core.Response;
  * Created by i303874 on 05/10/16.
  */
 @Singleton
-@Path("/hello")
-public class HelloWorldAPI {
-    private HelloWorldService service;
+@Path("/simulator")
+public class SimulatorAPI {
+    private SimulatorService service;
 
-    public HelloWorldAPI(HelloWorldService service) {
+    public SimulatorAPI(SimulatorService service) {
         this.service = service;
     }
 
     @GET
     @Path("/{param}")
-    public Response hello(@PathParam("param") String name) {
+    public Response hello(@PathParam("param") long duration) {
+        service.simulate(duration);
         return Response
                 .status(Response.Status.OK)
-                .entity(service.hello(name))
                 .build();
     }
 }

@@ -71,6 +71,13 @@
             <artifactId>metrics3-riemann-reporter</artifactId>
             <version>0.4.2</version>
         </dependency>
+
+        <!-- jvm profiler -->
+        <dependency>
+            <groupId>riemann-jvm-profiler</groupId>
+            <artifactId>riemann-jvm-profiler</artifactId>
+            <version>0.1.0</version>
+        </dependency>
     </dependencies>
 
 </project>
