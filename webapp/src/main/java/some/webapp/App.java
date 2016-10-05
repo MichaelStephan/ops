@@ -52,20 +52,20 @@ public class App {
 
         /* metrics configuration */
         MetricRegistry registry = new MetricRegistry();
-//        {
-//            ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
-//                    .convertRatesTo(TimeUnit.SECONDS)
-//                    .convertDurationsTo(TimeUnit.MILLISECONDS)
-//                    .build();
-//            reporter.start(1, TimeUnit.SECONDS);
-//        }
+        {
+            ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
+                    .convertRatesTo(TimeUnit.SECONDS)
+                    .convertDurationsTo(TimeUnit.MILLISECONDS)
+                    .build();
+            reporter.start(15, TimeUnit.SECONDS);
+        }
 
         try {
             Riemann riemann = new Riemann(RIEMANN_HOST, RIEMANN_PORT, RIEMANN_BATCHSIZE);
             RiemannReporter reporter = RiemannReporter.forRegistry(registry)
                     .tags(Arrays.asList(RIEMANN_TAGS))
                     .build(riemann);
-            reporter.start(5, TimeUnit.SECONDS);
+            reporter.start(15, TimeUnit.SECONDS);
         } catch (IOException e) {
             /* ignore */
         }
