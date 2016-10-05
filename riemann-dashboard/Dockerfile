@@ -10,6 +10,7 @@ RUN gem install riemann-dash
 RUN addgroup riemann && \
       adduser --disabled-password --ingroup riemann --gecos '' riemann
 ADD ./config.rb /etc/riemann/riemann-dash-config.rb
+ADD ./config.json /etc/riemann/config.json
 USER riemann
 EXPOSE 4567
 ENTRYPOINT ["riemann-dash", "/etc/riemann/riemann-dash-config.rb"]
