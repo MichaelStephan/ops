@@ -21,11 +21,28 @@ public class SimulatorAPI {
     }
 
     @GET
-    @Path("/{param}")
-    public Response hello(@PathParam("param") long duration) {
-        service.simulate(duration);
+    @Path("/something/{param}")
+    public Response simulateSomething(@PathParam("param") long duration) {
+        service.something(duration);
         return Response
                 .status(Response.Status.OK)
+                .build();
+    }
+
+    @GET
+    @Path("/state-change/{param}")
+    public Response simulateStateChange(@PathParam("param") String state) {
+        service.stateChange(state);
+        return Response
+                .status(Response.Status.OK)
+                .build();
+    }
+
+    @GET
+    @Path("/response/{param}")
+    public Response simulateStateChange(@PathParam("param") int status) {
+        return Response
+                .status(status)
                 .build();
     }
 }
