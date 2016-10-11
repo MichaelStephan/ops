@@ -45,5 +45,15 @@ public class SimulatorAPI {
                 .status(status)
                 .build();
     }
+
+    @GET
+    @Path("/dependency/{fail}")
+    public Response simulateDependency(@PathParam("fail") boolean fail) {
+        service.simulateDependency(fail);
+        return Response
+                .status(Response.Status.OK)
+                .build();
+    }
+
 }
 

@@ -16,6 +16,10 @@ import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
 import com.codahale.metrics.logback.InstrumentedAppender;
 import com.codahale.metrics.riemann.Riemann;
 import com.codahale.metrics.riemann.RiemannReporter;
+import com.netflix.hystrix.contrib.servopublisher.HystrixServoMetricsPublisher;
+import com.netflix.hystrix.strategy.HystrixPlugins;
+import com.netflix.servo.publish.*;
+import com.netflix.servo.publish.graphite.GraphiteMetricObserver;
 import io.riemann.riemann.client.RiemannClient;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -27,7 +31,9 @@ import some.webapp.api.SimulatorAPI;
 import some.webapp.service.SimulatorService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -35,14 +41,17 @@ import java.util.concurrent.TimeUnit;
  * Created by i303874 on 05/10/16.
  */
 public class App {
+    private final static String INSTANCE = "instance1";
+    private final static String GRAPHITE_ENDPOINT = "localhost:2003";
     private final static String RIEMANN_HOST = "localhost";
     private final static int RIEMANN_PORT = 5555;
     private final static int RIEMANN_HTTP_PORT = 5556;
     private final static String TAG = "someWebApp";
     private final static String[] RIEMANN_TAGS = {TAG};
     private final static int RIEMANN_BATCHSIZE = 1000;
-    private final static int INTERVAL = 15;
+    private final static int INTERVAL = 5;
 
+    /* this is a bit dirty ;) */
     private static void startJVMProfiler() {
         Clojure.var("clojure.core", "require").invoke(Symbol.intern("riemann.jvm-profiler"));
         IFn start = Clojure.var("riemann.jvm-profiler", "start-global!");
@@ -90,7 +99,7 @@ public class App {
             Riemann riemann = new Riemann(RIEMANN_HOST, RIEMANN_PORT, RIEMANN_BATCHSIZE);
             RiemannReporter reporter = RiemannReporter.forRegistry(registry)
                     .tags(Arrays.asList(RIEMANN_TAGS))
-                    .localHost("instance1")
+                    .localHost(INSTANCE)
                     .build(riemann);
             reporter.start(INTERVAL, TimeUnit.SECONDS);
         } catch (IOException e) {
@@ -102,8 +111,18 @@ public class App {
         registerAll("memory", new MemoryUsageGaugeSet(), registry);
         registerAll("threads", new ThreadStatesGaugeSet(), registry);
 
-        /* jvm profiler, this is a bit dirty ;) */
+        /* jvm profiler */
         startJVMProfiler();
+
+        /* hystrix metrics */
+        HystrixPlugins.getInstance().registerMetricsPublisher(HystrixServoMetricsPublisher.getInstance());
+        final List<MetricObserver> observers = new ArrayList<>();
+
+        // always use <instanceId>.<tag>.hystrix as metric prefix. The riemann server will parse the input to get the host right
+        observers.add(new GraphiteMetricObserver(INSTANCE + "." + TAG + ".hystrix", GRAPHITE_ENDPOINT));
+        PollScheduler.getInstance().start();
+        PollRunnable task = new PollRunnable(new MonitorRegistryMetricPoller(), BasicMetricFilter.MATCH_ALL, true, observers);
+        PollScheduler.getInstance().addPoller(task, INTERVAL, TimeUnit.SECONDS);
 
         /* service configs */
         RiemannClient riemannClient = null;

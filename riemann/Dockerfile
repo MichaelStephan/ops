@@ -13,6 +13,7 @@ RUN cd /opt && \
   mv riemann-0.2.11 riemann
 ADD etc/riemann.config /etc/riemann/riemann.config
 USER riemann
+EXPOSE 2003
 EXPOSE 5555
 EXPOSE 5555/udp
 EXPOSE 5556

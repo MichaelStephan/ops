@@ -5,6 +5,7 @@ import com.codahale.metrics.MetricRegistry;
 import io.riemann.riemann.client.RiemannClient;
 
 import java.io.IOException;
+import java.rmi.Remote;
 import java.util.Random;
 
 /**
@@ -51,5 +52,10 @@ public class SimulatorService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void simulateDependency(boolean fail) {
+        RemoteRequestCommand cmd = new RemoteRequestCommand(fail);
+        cmd.queue();
     }
 }
