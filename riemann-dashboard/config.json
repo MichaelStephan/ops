@@ -30,7 +30,7 @@
   {"name":"someWebApp Http Metrics","view":
       {"type":"Balloon","weight":1,"id":"41","version":0,"child":
         {"type":"VStack","weight":1,"id":"42","version":0,"children":[
-          {"type":"Gauge","weight":1,"id":"43","version":1,"title":"Requests","query":"(service = \"org.eclipse.jetty.servlet.ServletHandler.requests count\") and (tagged \"someWebApp\") and (host = nil)"},
+          {"type":"Gauge","weight":1,"id":"43","version":1,"title":"Requests","query":"(service = \"org.eclipse.jetty.servlet.ServletHandler.requests count_sum\") and (tagged \"someWebApp\") and (host = nil)"},
           {"type":"Grid","weight":5,"id":"35","version":9,"title":"Codes","query":"(service =~ \"org.eclipse.jetty.servlet.ServletHandler.%xx-responses count_dt\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"},
           {"type":"Grid","weight":5,"id":"36","version":9,"title":"Duration percentiles","query":"(service =~ \"org.eclipse.jetty.servlet.ServletHandler.requests p%\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
         ]}}},
