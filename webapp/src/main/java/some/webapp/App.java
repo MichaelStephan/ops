@@ -32,7 +32,6 @@ import some.webapp.service.SimulatorService;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +46,6 @@ public class App {
     private final static int RIEMANN_PORT = 5555;
     private final static int RIEMANN_HTTP_PORT = 5556;
     private final static String TAG = "someWebApp";
-    private final static String[] RIEMANN_TAGS = {TAG};
     private final static int RIEMANN_BATCHSIZE = 1000;
     private final static int INTERVAL = 5;
 
@@ -98,7 +96,7 @@ public class App {
         try {
             Riemann riemann = new Riemann(RIEMANN_HOST, RIEMANN_PORT, RIEMANN_BATCHSIZE);
             RiemannReporter reporter = RiemannReporter.forRegistry(registry)
-                    .tags(Arrays.asList(RIEMANN_TAGS))
+                    .prefixedWith(TAG)
                     .localHost(INSTANCE)
                     .build(riemann);
             reporter.start(INTERVAL, TimeUnit.SECONDS);

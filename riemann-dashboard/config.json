@@ -16,28 +16,31 @@
           {"type":"HStack","weight":1,"id":"23","version":0,"children":[
             {"type":"Flot","weight":1,"id":"24","version":3,
               "title":"Logs",
-              "query":"(service = \"ch.qos.logback.core.Appender.all count_sum_dt\") and (tagged \"someWebApp\") and (host = nil)","min":null,"max":null,"timeRange":300,"graphType":"line","stackMode":"false","tooltips":"metric"}
+              "query":"(service = \"someWebApp ch.qos.logback.core.Appender.all count_sum_dt\")","min":null,"max":null,"timeRange":300,"graphType":"line","stackMode":"false","tooltips":"metric"}
           ]},
-          {"type":"Grid","weight":5,"id":"25","version":9,"title":"Delta","query":"(service =~ \"ch.qos.logback.core.Appender.%count_dt\") and (tagged \"someWebApp\") and (host != nil)","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
+          {"type":"Grid","weight":5,"id":"25","version":9,"title":"Counts","query":"(service =~ \"someWebApp ch.qos.logback.core.Appender.%count_dt\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
         ]}}},
   {"name":"someWebApp JVM Metrics","view":
       {"type":"Balloon","weight":1,"id":"31","version":0,"child":
         {"type":"VStack","weight":1,"id":"32","version":0,"children":[
-          {"type":"Grid","weight":5,"id":"35","version":9,"title":"GC","query":"(service =~ \"gc%\") and (tagged \"someWebApp\") and (host != nil)","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"},
-          {"type":"Grid","weight":6,"id":"35","version":9,"title":"Thread","query":"(service =~ \"threads%\") and (tagged \"someWebApp\") and (host != nil)","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"},
-          {"type":"Grid","weight":7,"id":"35","version":9,"title":"Memory (mb)","query":"(service =~ \"memory%used\") and (tagged \"someWebApp\") and (host != nil)","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
+          {"type":"Grid","weight":5,"id":"35","version":9,"title":"GC","query":"(service =~ \"someWebApp gc%\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"},
+          {"type":"Grid","weight":6,"id":"35","version":9,"title":"Thread","query":"(service =~ \"someWebApp threads%\") and (host != nil)","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"},
+          {"type":"Grid","weight":7,"id":"35","version":9,"title":"Memory (mb)","query":"(service =~ \"someWebApp memory%used\") and (host != nil)","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
         ]}}},
   {"name":"someWebApp Http Metrics","view":
       {"type":"Balloon","weight":1,"id":"41","version":0,"child":
         {"type":"VStack","weight":1,"id":"42","version":0,"children":[
-          {"type":"Gauge","weight":1,"id":"43","version":1,"title":"Requests","query":"(service = \"org.eclipse.jetty.servlet.ServletHandler.requests count_sum\") and (tagged \"someWebApp\") and (host = nil)"},
-          {"type":"Grid","weight":5,"id":"35","version":9,"title":"Codes","query":"(service =~ \"org.eclipse.jetty.servlet.ServletHandler.%xx-responses count_dt\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"},
-          {"type":"Grid","weight":5,"id":"36","version":9,"title":"Duration percentiles","query":"(service =~ \"org.eclipse.jetty.servlet.ServletHandler.requests p%\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
+          {"type":"Gauge","weight":1,"id":"43","version":1,"title":"Requests","query":"(service = \"someWebApp org.eclipse.jetty.servlet.ServletHandler.requests count_sum\") and (host = nil)"},
+          {"type":"Grid","weight":5,"id":"35","version":9,"title":"Codes","query":"(service =~ \"someWebApp org.eclipse.jetty.servlet.ServletHandler.%xx-responses count_dt\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"},
+          {"type":"Grid","weight":5,"id":"36","version":9,"title":"Duration percentiles","query":"(service =~ \"someWebApp org.eclipse.jetty.servlet.ServletHandler.requests p%\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
         ]}}},
   {"name":"someWebApp Hystrix Metrics","view":
     {"type":"Balloon","weight":1,"id":"51","version":0,"child":
       {"type":"VStack","weight":1,"id":"52","version":0,"children":[
-        {"type":"Flot","weight":5,"id":"55","version":9,"title":"RemoteRequestCommand Percentiles","query":"(service =~ \"%RemoteRequestCommand.latencyTotal_percentile%\") and (host = nil)","min":0,"max":null,"timeRange":300,"graphType":"line","stackMode":"false","tooltips":"metric"},
-        {"type":"Grid","weight":5,"id":"56","version":9,"title":"RemoteRequestCommand stats","query":"(service =~ \"%hystrix%_dt\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
+        {"type":"HStack","weight":5,"id":"53","version":0,"children":[
+          {"type":"Flot","weight":8,"id":"54","version":9,"title":"Percentiles","query":"(service =~ \"someWebApp hystrix.HystrixCommand.RemoteRequestCommand.latencyTotal_percentile%\") and (host = nil)","min":0,"max":null,"timeRange":300,"graphType":"line","stackMode":"false","tooltips":"metric"},
+          {"type":"Grid","weight":2,"id":"56","version":9,"title":"CB Open","query":"(service = \"someWebApp hystrix.HystrixCommand.RemoteRequestCommand.isCircuitBreakerOpen\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
+        ]},
+        {"type":"Grid","weight":5,"id":"57","version":9,"title":"RemoteRequestCommand stats","query":"(service =~ \"%hystrix%_dt\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
         ]}}}
   ]}
