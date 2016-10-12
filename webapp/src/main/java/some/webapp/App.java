@@ -47,7 +47,7 @@ public class App {
     private final static int RIEMANN_HTTP_PORT = 5556;
     private final static String TAG = "someWebApp";
     private final static int RIEMANN_BATCHSIZE = 1000;
-    private final static int INTERVAL = 15;
+    private final static int INTERVAL = 25;
 
     /* this is a bit dirty ;) */
     private static void startJVMProfiler() {
