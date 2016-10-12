@@ -24,7 +24,7 @@
       {"type":"Balloon","weight":1,"id":"31","version":0,"child":
         {"type":"VStack","weight":1,"id":"32","version":0,"children":[
           {"type":"Grid","weight":5,"id":"35","version":9,"title":"GC","query":"(service =~ \"someWebApp gc%\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"},
-          {"type":"Grid","weight":6,"id":"35","version":9,"title":"Thread","query":"(service =~ \"someWebApp threads%\") and (host != nil)","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"},
+          {"type":"Grid","weight":6,"id":"35","version":9,"title":"Thread","query":"(service =~ \"someWebApp thread%\") and (host != nil)","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"},
           {"type":"Grid","weight":7,"id":"35","version":9,"title":"Memory (mb)","query":"(service =~ \"someWebApp memory%used\") and (host != nil)","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
         ]}}},
   {"name":"someWebApp Http Metrics","view":

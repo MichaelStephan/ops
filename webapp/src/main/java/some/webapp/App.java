@@ -47,7 +47,7 @@ public class App {
     private final static int RIEMANN_HTTP_PORT = 5556;
     private final static String TAG = "someWebApp";
     private final static int RIEMANN_BATCHSIZE = 1000;
-    private final static int INTERVAL = 5;
+    private final static int INTERVAL = 15;
 
     /* this is a bit dirty ;) */
     private static void startJVMProfiler() {
@@ -107,7 +107,7 @@ public class App {
         /* jvm metric set */
         registerAll("gc", new GarbageCollectorMetricSet(), registry);
         registerAll("memory", new MemoryUsageGaugeSet(), registry);
-        registerAll("threads", new ThreadStatesGaugeSet(), registry);
+        registerAll("thread", new ThreadStatesGaugeSet(), registry);
 
         /* jvm profiler */
         startJVMProfiler();
