@@ -43,10 +43,14 @@
         ]},
         {"type":"Grid","weight":5,"id":"57","version":9,"title":"RemoteRequestCommand stats","query":"(service =~ \"%hystrix%_dt\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
         ]}}},
-
    {"name":"Health","view":
       {"type":"Balloon","weight":1,"id":"61","version":0,"child":
         {"type":"VStack","weight":1,"id":"62","version":0,"children":[
-          {"type":"Grid","weight":1,"id":"63","version":4,"title":"Health","query":"service ~= \"%-health$\"","max":"","rows":"service","cols":"value","row_sort":"metric","col_sort":"lexical"}
+          {"type":"Grid","weight":1,"id":"63","version":4,"title":"Health","query":"service =~ \"%health\"","max":"","rows":"service","cols":"value","row_sort":"metric","col_sort":"lexical"}
+        ]}}},
+   {"name":"Maintenance","view":
+      {"type":"Balloon","weight":1,"id":"71","version":0,"child":
+        {"type":"VStack","weight":1,"id":"72","version":0,"children":[
+          {"type":"Log","weight":1,"id":"","version":73,"title":"Status","query":"(type = \"maintenance-mode\")","lines":"1000"}
         ]}}}
   ]}
