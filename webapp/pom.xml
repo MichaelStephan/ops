@@ -18,6 +18,19 @@ http://www.w3.org/2001/XMLSchema-instance ">
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>some.webapp.App</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -90,7 +103,7 @@ http://www.w3.org/2001/XMLSchema-instance ">
             <version>1.1.7</version>
         </dependency>
 
-       <!-- servo -->
+        <!-- servo -->
         <dependency>
             <groupId>com.netflix.servo</groupId>
             <artifactId>servo-graphite</artifactId>

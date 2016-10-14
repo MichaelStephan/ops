@@ -5,7 +5,6 @@ import ch.qos.logback.classic.LoggerContext;
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 import clojure.lang.Symbol;
-import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
@@ -34,28 +33,53 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Created by i303874 on 05/10/16.
  */
 public class App {
-    private final static String INSTANCE = "instance1";
-    private final static String GRAPHITE_ENDPOINT = "localhost:2003";
-    private final static String RIEMANN_HOST = "localhost";
-    private final static int RIEMANN_PORT = 5555;
-    private final static int RIEMANN_HTTP_PORT = 5556;
     private final static String TAG = "someWebApp";
     private final static int RIEMANN_BATCHSIZE = 1000;
     private final static int INTERVAL = 25;
+    private final static Random rand = new Random();
+
+    private static int withDefault(String value, int defaultValue) {
+        return value == null ? defaultValue : Integer.parseInt(value);
+    }
+
+    private static String withDefault(String value, String defaultValue) {
+        return value == null ? defaultValue : value;
+    }
+
+    private static String getInstance() {
+        return withDefault(System.getenv("CF_INSTANCE_INDEX"), "-1") + "_" + rand.nextInt(10000);
+    }
+
+    private static String getGraphiteEndpoint() {
+        return withDefault(System.getenv("GRAPHITE_ENDPOINT"), "localhost:2003");
+    }
+
+    private static String getRiemannHost() {
+        return withDefault(System.getenv("RIEMANN_HOST"), "localhost");
+    }
+
+    private static int getRiemannTcpPort() {
+        return withDefault(System.getenv("RIEMANN_TCP_PORT"), 5555);
+    }
+
+    private static int getRiemannHttpPort() {
+        return withDefault(System.getenv("RIEMANN_HTTP_PORT"), 5556);
+    }
 
     /* this is a bit dirty ;) */
     private static void startJVMProfiler() {
         Clojure.var("clojure.core", "require").invoke(Symbol.intern("riemann.jvm-profiler"));
         IFn start = Clojure.var("riemann.jvm-profiler", "start-global!");
         start.invoke(Clojure.read("{" +
-                " :host \"" + RIEMANN_HOST + "\"" +
-                " :port " + RIEMANN_HTTP_PORT +
+                " :host \"" + getRiemannHost() + "\"" +
+                " :port " + getRiemannHttpPort() +
                 " :prefix" + "\"" + TAG + " \"" + // WARNING unfortunately the prefix also needs to contain a whitespace in the end !
                 " :load " + 0.02 +
                 "}"));
@@ -85,19 +109,19 @@ public class App {
         metrics.start();
         root.addAppender(metrics);
 
-        {
-            ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
-                    .convertRatesTo(TimeUnit.SECONDS)
-                    .convertDurationsTo(TimeUnit.MILLISECONDS)
-                    .build();
-            reporter.start(INTERVAL, TimeUnit.SECONDS);
-        }
+//        {
+//            ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
+//                    .convertRatesTo(TimeUnit.SECONDS)
+//                    .convertDurationsTo(TimeUnit.MILLISECONDS)
+//                    .build();
+//            reporter.start(INTERVAL, TimeUnit.SECONDS);
+//        }
 
         try {
-            Riemann riemann = new Riemann(RIEMANN_HOST, RIEMANN_PORT, RIEMANN_BATCHSIZE);
+            Riemann riemann = new Riemann(getRiemannHost(), getRiemannTcpPort(), RIEMANN_BATCHSIZE);
             RiemannReporter reporter = RiemannReporter.forRegistry(registry)
                     .prefixedWith(TAG)
-                    .localHost(INSTANCE)
+                    .localHost(getInstance())
                     .build(riemann);
             reporter.start(INTERVAL, TimeUnit.SECONDS);
         } catch (IOException e) {
@@ -117,7 +141,7 @@ public class App {
         final List<MetricObserver> observers = new ArrayList<>();
 
         // always use <instanceId>.<tag>.hystrix as metric prefix. The riemann server will parse the input to get the host right
-        observers.add(new GraphiteMetricObserver(INSTANCE + "." + TAG + "_remote.hystrix", GRAPHITE_ENDPOINT));
+        observers.add(new GraphiteMetricObserver(getInstance() + "." + TAG + "_remote.hystrix", getGraphiteEndpoint()));
         PollScheduler.getInstance().start();
         PollRunnable task = new PollRunnable(new MonitorRegistryMetricPoller(), BasicMetricFilter.MATCH_ALL, true, observers);
         PollScheduler.getInstance().addPoller(task, INTERVAL, TimeUnit.SECONDS);
@@ -125,10 +149,10 @@ public class App {
         /* service configs */
         RiemannClient riemannClient = null;
         try {
-            riemannClient = RiemannClient.tcp(RIEMANN_HOST, RIEMANN_PORT);
+            riemannClient = RiemannClient.tcp(getRiemannHost(), getRiemannTcpPort());
             riemannClient.connect();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            /* ignore */
         }
 
         SimulatorService simulatorService = new SimulatorService(registry, riemannClient);
@@ -144,7 +168,7 @@ public class App {
         context.setHandler(new InstrumentedHandler(registry));
 
         /* server configuration */
-        Server server = new Server(2222);
+        Server server = new Server(6666);
         server.setStopTimeout(60 * 1000);
         server.setHandler(context);
 
