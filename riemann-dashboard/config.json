@@ -38,8 +38,8 @@
     {"type":"Balloon","weight":1,"id":"51","version":0,"child":
       {"type":"VStack","weight":1,"id":"52","version":0,"children":[
         {"type":"HStack","weight":5,"id":"53","version":0,"children":[
-          {"type":"Flot","weight":8,"id":"54","version":9,"title":"Percentiles","query":"(service =~ \"someWebApp hystrix.HystrixCommand.RemoteRequestCommand.latencyTotal_percentile%\") and (host = nil)","min":0,"max":null,"timeRange":300,"graphType":"line","stackMode":"false","tooltips":"metric"},
-          {"type":"Grid","weight":2,"id":"56","version":9,"title":"CB Open","query":"(service = \"someWebApp hystrix.HystrixCommand.RemoteRequestCommand.isCircuitBreakerOpen\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
+          {"type":"Flot","weight":8,"id":"54","version":9,"title":"Percentiles","query":"(service =~ \"someWebApp_remote hystrix.HystrixCommand.RemoteRequestCommand.latencyTotal_percentile%\") and (host = nil)","min":0,"max":null,"timeRange":300,"graphType":"line","stackMode":"false","tooltips":"metric"},
+          {"type":"Grid","weight":2,"id":"56","version":9,"title":"CB Open","query":"(service = \"someWebApp_remote hystrix.HystrixCommand.RemoteRequestCommand.isCircuitBreakerOpen\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
         ]},
         {"type":"Grid","weight":5,"id":"57","version":9,"title":"RemoteRequestCommand stats","query":"(service =~ \"%hystrix%_dt\")","max":"","rows":"","cols":"","row_sort":"lexical","col_sort":"lexical"}
         ]}}},

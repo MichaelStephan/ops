@@ -3,6 +3,8 @@ package some.webapp.service;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import io.riemann.riemann.client.RiemannClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.rmi.Remote;
@@ -14,7 +16,8 @@ import java.util.Random;
 public class SimulatorService {
     private final static long MAX_DURATION = 5000;
 
-    RiemannClient riemannClient;
+    final static Logger logger = LoggerFactory.getLogger(SimulatorService.class);
+    private RiemannClient riemannClient;
     private Meter something;
     private Random random = new Random();
 
@@ -57,5 +60,9 @@ public class SimulatorService {
     public void simulateDependency(boolean fail) {
         RemoteRequestCommand cmd = new RemoteRequestCommand(fail);
         cmd.queue();
+    }
+
+    public void simulateErrorLog() {
+        logger.error("error");
     }
 }

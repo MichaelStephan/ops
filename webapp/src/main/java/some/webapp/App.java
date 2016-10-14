@@ -117,7 +117,7 @@ public class App {
         final List<MetricObserver> observers = new ArrayList<>();
 
         // always use <instanceId>.<tag>.hystrix as metric prefix. The riemann server will parse the input to get the host right
-        observers.add(new GraphiteMetricObserver(INSTANCE + "." + TAG + ".hystrix", GRAPHITE_ENDPOINT));
+        observers.add(new GraphiteMetricObserver(INSTANCE + "." + TAG + "_remote.hystrix", GRAPHITE_ENDPOINT));
         PollScheduler.getInstance().start();
         PollRunnable task = new PollRunnable(new MonitorRegistryMetricPoller(), BasicMetricFilter.MATCH_ALL, true, observers);
         PollScheduler.getInstance().addPoller(task, INTERVAL, TimeUnit.SECONDS);

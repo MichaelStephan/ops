@@ -55,5 +55,13 @@ public class SimulatorAPI {
                 .build();
     }
 
+    @GET
+    @Path("/error-log")
+    public Response simulateErrorLog() {
+        service.simulateErrorLog();
+        return Response
+                .status(Response.Status.OK)
+                .build();
+    }
 }
 
