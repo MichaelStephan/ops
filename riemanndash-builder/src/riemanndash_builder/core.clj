@@ -115,7 +115,7 @@
                                (grid-template
                                 :weight 5
                                 :title (str cmd " stats")
-                                :query "(service =~ \"%hystrix%_dt\")")]))}))
+                                :query (str "(service =~ \"" (metric "%_dt") "\")"))]))}))
 
 (defn logs-template [app]
   {:name (str app " log")
