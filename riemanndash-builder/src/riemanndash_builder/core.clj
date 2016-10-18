@@ -96,9 +96,11 @@
                               :cols "value"
                               :row_sort "metric")]))})
 
+(defn hystrix-metric-name [app cmd metric-name]
+  (str app " hystrix.HystrixCommand." cmd "." metric-name))
+
 (defn hystrix-cmd-template [app cmd]
-  (let [metric (fn [metric-name]
-                 (str app " hystrix.HystrixCommand." cmd "." metric-name))]
+  (let [metric-name (partial hystrix-metric-name app cmd)]
     {:name cmd
      :view (baloon-template
             :child (vstack-template
@@ -107,15 +109,15 @@
                                 :children [(flot-template
                                             :weight 8
                                             :title "percentiles"
-                                            :query (str "(service =~ \"" (metric "latencyTotal_percentile%") "\") and (host = nil)"))
+                                            :query (str "(service =~ \"" (metric-name "latencyTotal_percentile%") "\") and (host = nil)"))
                                            (grid-template
                                             :weight 2
                                             :title "circuit breaker open?"
-                                            :query (str "(service = \"" (metric "isCircuitBreakerOpen") "\")"))])
+                                            :query (str "(service = \"" (metric-name "isCircuitBreakerOpen") "\")"))])
                                (grid-template
                                 :weight 5
                                 :title (str cmd " stats")
-                                :query (str "(service =~ \"" (metric "%_dt") "\")"))]))}))
+                                :query (str "(service =~ \"" (metric-name "%_dt") "\")"))]))}))
 
 (defn logs-template [app]
   {:name (str app " log")
@@ -181,11 +183,13 @@
                               :query "service =~ \"%health\"")]))})
 
 (defn hystrix-cmds-template [app cmds]
-  (flatten (map (fn [[service cmds]]
-                  (flatten (map (fn [cmd]
-                                  (hystrix-cmd-template (str app "_remote") (str (name service) "-" cmd)))
-                                cmds)))
-                hystrix-cmds)))
+  (flatten
+   (map (fn [[service cmds]]
+          (flatten
+           (map (fn [cmd]
+                  (hystrix-cmd-template (str app "_remote") (str (name service) "-" cmd)))
+                cmds)))
+        cmds)))
 
 (def hystrix-cmds {:package-v1-subscription ["subscription-getBySubscriberAndId" "subscription-getByTenant" "subscription-terminateSubscriptions"]
                    :package-v1-repository ["data-getByQuery" "data-Update" "data-Create" "data-Delete" "data-AttributeDelete" "data-getById"]
@@ -208,5 +212,16 @@
                                   (maintenance-template)
                                   (health-template)]
                                  (hystrix-cmds-template app hystrix-cmds)))}))
+
+(defn hystrix-thresholds [app cmds metric-name]
+  (flatten
+   (map (fn [[service cmds]]
+          (flatten
+           (map (fn [cmd]
+                  (hystrix-metric-name app cmd metric-name))
+                cmds)))
+        cmds)))
+
+(def x (hystrix-thresholds "someWebApp_remote" hystrix-cmds "isCircuitBreakerOpen"))
 
 (spit "/Users/i303874/Desktop/ops/riemann-dashboard/config.json" (json/write-str (main-template)))
