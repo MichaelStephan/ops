@@ -1,5 +1,8 @@
 package some.webapp.api;
 
+import com.codahale.metrics.annotation.ExceptionMetered;
+import com.codahale.metrics.annotation.Metered;
+import com.codahale.metrics.annotation.Timed;
 import some.webapp.service.SimulatorService;
 
 import javax.inject.Singleton;
@@ -24,15 +27,6 @@ public class SimulatorAPI {
     @Path("/something/{param}")
     public Response simulateSomething(@PathParam("param") long duration) {
         service.something(duration);
-        return Response
-                .status(Response.Status.OK)
-                .build();
-    }
-
-    @GET
-    @Path("/state-change/{param}")
-    public Response simulateStateChange(@PathParam("param") String state) {
-        service.stateChange(state);
         return Response
                 .status(Response.Status.OK)
                 .build();

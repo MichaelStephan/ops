@@ -2,7 +2,6 @@ package some.webapp.service;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import io.riemann.riemann.client.RiemannClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,13 +16,11 @@ public class SimulatorService {
     private final static long MAX_DURATION = 5000;
 
     final static Logger logger = LoggerFactory.getLogger(SimulatorService.class);
-    private RiemannClient riemannClient;
     private Meter something;
     private Random random = new Random();
 
-    public SimulatorService(MetricRegistry registry, RiemannClient riemannClient) {
+    public SimulatorService(MetricRegistry registry) {
         this.something = registry.meter("something");
-        this.riemannClient = riemannClient;
     }
 
     public void something(long duration) {
@@ -40,20 +37,6 @@ public class SimulatorService {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    public void stateChange(String state) {
-        try {
-            riemannClient.event().
-                    service("fridge").
-                    state(state).
-                    metric(5.3).
-                    tags("appliance", "cold").
-                    send().
-                    deref(1000, java.util.concurrent.TimeUnit.MILLISECONDS);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

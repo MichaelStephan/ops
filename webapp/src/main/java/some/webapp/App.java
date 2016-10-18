@@ -1,9 +1,8 @@
 package some.webapp;
 
 import com.codahale.metrics.*;
-import com.codahale.metrics.jetty9.InstrumentedHandler;
-import io.MetricsFramework;
-import io.riemann.riemann.client.RiemannClient;
+import com.codahale.metrics.jersey2.InstrumentedResourceMethodApplicationListener;
+import yaas.io.framework.MetricsFramework;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -11,8 +10,10 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import some.webapp.api.SimulatorAPI;
 import some.webapp.service.SimulatorService;
+import yaas.io.servlet.filter.MetricsServletFilter;
 
-import java.io.IOException;
+import javax.servlet.DispatcherType;
+import java.util.EnumSet;
 
 
 /**
@@ -20,21 +21,12 @@ import java.io.IOException;
  */
 public class App {
     public static void main(String[] args) {
-        MetricsFramework metricsFramework = new MetricsFramework();
+        MetricsFramework metricsFramework = MetricsFramework.getInstance();
 
         /* metrics configuration */
         MetricRegistry registry = new MetricRegistry();
 
-        /* service configs */
-        RiemannClient riemannClient = null;
-        try {
-            riemannClient = RiemannClient.tcp(metricsFramework.getRiemannHost(), metricsFramework.getRiemannTcpPort());
-            riemannClient.connect();
-        } catch (IOException e) {
-            /* ignore */
-        }
-
-        SimulatorService simulatorService = new SimulatorService(registry, riemannClient);
+        SimulatorService simulatorService = new SimulatorService(registry);
 
         /* resources configuration */
         ResourceConfig resourceConfig = new ResourceConfig();
@@ -42,9 +34,8 @@ public class App {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
         context.setContextPath("/");
         context.addServlet(new ServletHolder(new ServletContainer(resourceConfig)), "/*");
-
-        /* handler configuration */
-        context.setHandler(new InstrumentedHandler(registry));
+        context.addFilter(MetricsServletFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
+        resourceConfig.register(new InstrumentedResourceMethodApplicationListener(metricsFramework.getMetricsRegistry()));
 
         metricsFramework.start();
 

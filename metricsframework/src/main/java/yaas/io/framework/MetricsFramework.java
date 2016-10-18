@@ -1,4 +1,4 @@
-package io;
+package yaas.io.framework;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import ch.qos.logback.classic.LoggerContext;
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 import clojure.lang.Symbol;
+import io.riemann.riemann.client.RiemannClient;
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
@@ -26,45 +27,61 @@ import com.netflix.hystrix.contrib.servopublisher.HystrixServoMetricsPublisher;
 import com.netflix.hystrix.strategy.HystrixPlugins;
 import com.netflix.servo.publish.*;
 import com.netflix.servo.publish.graphite.GraphiteMetricObserver;
-import io.riemann.riemann.client.RiemannClient;
 import org.slf4j.LoggerFactory;
 
 /**
  * Created by i303874 on 18/10/2016.
  */
 public class MetricsFramework {
-    public MetricsFramework() {
+    private static MetricsFramework INSTANCE;
+
+    private final static int RIEMANN_BATCHSIZE = 100;
+    private final static int INTERVAL = 25;
+
+    private final Random rand = new Random();
+
+    private final MetricRegistry registry = new MetricRegistry();
+
+    public static synchronized MetricsFramework getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new MetricsFramework();
+        }
+        return INSTANCE;
     }
 
-    public static String getName() {
+    private MetricsFramework() {
+    }
+
+    public MetricRegistry getMetricsRegistry() {
+        return registry;
+    }
+
+    public String getName() {
         return withDefault(System.getenv("APP_NAME"), "unknown");
     }
 
-    public static String getInstance() {
+    public String getInstanceName() {
         return withDefault(System.getenv("CF_INSTANCE_INDEX"), rand.nextInt(10) * -1) + "_" + rand.nextInt(10000);
     }
 
-    public static String getGraphiteEndpoint() {
+    public String getGraphiteEndpoint() {
         return withDefault(System.getenv("GRAPHITE_ENDPOINT"), "localhost:2003");
     }
 
-    public static String getRiemannHost() {
+    public String getRiemannHost() {
         return withDefault(System.getenv("RIEMANN_HOST"), "localhost");
     }
 
-    public static int getRiemannTcpPort() {
+    public int getRiemannTcpPort() {
         return withDefault(System.getenv("RIEMANN_TCP_PORT"), 5555);
     }
 
-    public static int getRiemannHttpPort() {
+    public int getRiemannHttpPort() {
         return withDefault(System.getenv("RIEMANN_HTTP_PORT"), 5556);
     }
 
-    public void start() {
-        /* metrics configuration */
-        MetricRegistry registry = new MetricRegistry();
-
-                /* logger configuration */
+    public void startInternal() {
+        /* logger configuration */
         final LoggerContext factory = (LoggerContext) LoggerFactory.getILoggerFactory();
         final Logger root = factory.getLogger(Logger.ROOT_LOGGER_NAME);
 
@@ -74,19 +91,20 @@ public class MetricsFramework {
         metrics.start();
         root.addAppender(metrics);
 
-        {
-            ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
-                    .convertRatesTo(TimeUnit.SECONDS)
-                    .convertDurationsTo(TimeUnit.MILLISECONDS)
-                    .build();
-            reporter.start(INTERVAL, TimeUnit.SECONDS);
-        }
+//        {
+//            ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)
+//                    .convertRatesTo(TimeUnit.SECONDS).convertRatesTo(TimeUnit.SECONDS)
+//                    .convertDurationsTo(TimeUnit.MILLISECONDS)
+//                    .convertDurationsTo(TimeUnit.MILLISECONDS)
+//                    .build();
+//            reporter.start(INTERVAL, TimeUnit.SECONDS);
+//        }
 
         try {
             Riemann riemann = new Riemann(getRiemannHost(), getRiemannTcpPort(), RIEMANN_BATCHSIZE);
             RiemannReporter reporter = RiemannReporter.forRegistry(registry)
                     .prefixedWith(getName())
-                    .localHost(getInstance())
+                    .localHost(getInstanceName())
                     .build(riemann);
             reporter.start(INTERVAL, TimeUnit.SECONDS);
         } catch (IOException e) {
@@ -106,35 +124,26 @@ public class MetricsFramework {
         final List<MetricObserver> observers = new ArrayList<>();
 
         // always use <instanceId>.<tag>.hystrix as metric prefix. The riemann server will parse the input to get the host right
-        observers.add(new GraphiteMetricObserver(getInstance() + "." + getName() + "_remote.hystrix", getGraphiteEndpoint()));
+        observers.add(new GraphiteMetricObserver(getInstanceName() + "." + getName() + "_remote.hystrix", getGraphiteEndpoint()));
         PollScheduler.getInstance().start();
         PollRunnable task = new PollRunnable(new MonitorRegistryMetricPoller(), BasicMetricFilter.MATCH_ALL, true, observers);
         PollScheduler.getInstance().addPoller(task, INTERVAL, TimeUnit.SECONDS);
-
-        /* service configs */
-        RiemannClient riemannClient = null;
-        try {
-            riemannClient = RiemannClient.tcp(getRiemannHost(), getRiemannTcpPort());
-            riemannClient.connect();
-        } catch (IOException e) {
-            /* ignore */
-        }
     }
 
-    private final static int RIEMANN_BATCHSIZE = 1000;
-    private final static int INTERVAL = 25;
-    private final static Random rand = new Random();
+    public static void start() {
+        getInstance().startInternal();
+    }
 
-    private static int withDefault(String value, int defaultValue) {
+    private int withDefault(String value, int defaultValue) {
         return value == null ? defaultValue : Integer.parseInt(value);
     }
 
-    private static String withDefault(String value, String defaultValue) {
+    private String withDefault(String value, String defaultValue) {
         return value == null ? defaultValue : value;
     }
 
     /* this is a bit dirty ;) */
-    private static void startJVMProfiler() {
+    private void startJVMProfiler() {
         Clojure.var("clojure.core", "require").invoke(Symbol.intern("riemann.jvm-profiler"));
         IFn start = Clojure.var("riemann.jvm-profiler", "start-global!");
         start.invoke(Clojure.read("{" +
@@ -145,7 +154,7 @@ public class MetricsFramework {
                 "}"));
     }
 
-    private static void registerAll(String prefix, MetricSet metricSet, MetricRegistry registry) {
+    private void registerAll(String prefix, MetricSet metricSet, MetricRegistry registry) {
         for (Map.Entry<String, Metric> entry : metricSet.getMetrics().entrySet()) {
             if (entry.getValue() instanceof MetricSet) {
                 registerAll(prefix + "." + entry.getKey(), (MetricSet) entry.getValue(), registry);

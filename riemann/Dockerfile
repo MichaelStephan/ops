@@ -17,4 +17,4 @@ EXPOSE 2003
 EXPOSE 5555
 EXPOSE 5555/udp
 EXPOSE 5556
-ENTRYPOINT ["/opt/riemann/bin/riemann", "-a", "-Xmx1024m", "/etc/riemann/riemann.config"]
+ENTRYPOINT ["/opt/riemann/bin/riemann", "-a", "-Xmx1124m", "/etc/riemann/riemann.config"]
