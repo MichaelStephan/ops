@@ -36,6 +36,12 @@ http://www.w3.org/2001/XMLSchema-instance ">
 
 
     <dependencies>
+        <dependency>
+            <groupId>yaas.io</groupId>
+            <artifactId>metrics</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- webserver -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -71,84 +77,11 @@ http://www.w3.org/2001/XMLSchema-instance ">
             <version>2.7</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.netflix.hystrix</groupId>
-            <artifactId>hystrix-core</artifactId>
-            <version>1.5.6</version>
-        </dependency>
-
-        <!-- metrics -->
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-            <version>3.1.0</version>
-        </dependency>
-
-        <!-- logger -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.7</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>1.1.7</version>
-        </dependency>
-
-        <!-- servo -->
-        <dependency>
-            <groupId>com.netflix.servo</groupId>
-            <artifactId>servo-graphite</artifactId>
-            <version>0.12.7</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.netflix.hystrix</groupId>
-            <artifactId>hystrix-servo-metrics-publisher</artifactId>
-            <version>1.1.2</version>
-        </dependency>
-
-        <!-- metrics riemman connector -->
-        <dependency>
-            <groupId>io.riemann</groupId>
-            <artifactId>metrics3-riemann-reporter</artifactId>
-            <version>0.4.2</version>
-        </dependency>
-
-        <!-- jvm profiler -->
-        <dependency>
-            <groupId>riemann-jvm-profiler</groupId>
-            <artifactId>riemann-jvm-profiler</artifactId>
-            <version>0.1.0</version>
-        </dependency>
-
-        <!-- jvm metrics -->
-        <dependency>
-            <groupId>com.codahale.metrics</groupId>
-            <artifactId>metrics-jvm</artifactId>
-            <version>3.0.2</version>
-        </dependency>
-
         <!-- jetty metrics -->
         <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-jetty9</artifactId>
             <version>3.0.2</version>
-        </dependency>
-
-        <!-- logback metrics -->
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-logback</artifactId>
-            <version>3.1.2</version>
         </dependency>
 
     </dependencies>
