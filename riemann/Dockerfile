@@ -7,11 +7,10 @@ RUN apt-get update && \
 RUN addgroup riemann && \
       adduser --disabled-password --ingroup riemann --gecos '' riemann
 RUN cd /opt && \
-  wget https://aphyr.com/riemann/riemann-0.2.11.tar.bz2 && \
-  tar -xvf riemann-0.2.11.tar.bz2 && \
-  rm -rf riemann-0.2.11.tar.bz2 && \
-  mv riemann-0.2.11 riemann
-ADD etc/riemann.config /etc/riemann/riemann.config
+  wget https://aphyr.com/riemann/riemann-0.2.10.tar.bz2 && \
+  tar -xvf riemann-0.2.10.tar.bz2 && \
+  rm -rf riemann-0.2.10.tar.bz2 && \
+  mv riemann-0.2.10 riemann
 USER riemann
 EXPOSE 2003
 EXPOSE 5555
