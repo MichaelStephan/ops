@@ -180,7 +180,9 @@
           :child (vstack-template
                   :children [(grid-template
                               :title "health"
-                              :query "service =~ \"%health\"")]))})
+                              :query "service =~ \"%health\""
+                              :rows "service"
+                              :cols "1")]))})
 
 (defn hystrix-cmds-template [app cmds]
   (flatten
