@@ -43,8 +43,7 @@
                 (deref 5000 :timeout))]
     (condp = ret
       :timeout (throw+ {:type :riemann-timeout})
-      (println ret)
-      #_(infof "Stats\n %s" (apply str ret)))))
+      (infof "Stats\n %s" (apply str ret)))))
 
 (defn do-set-or-unset [riemann-client {:keys [service ttl description] :or {ttl 15}} set?]
   (when-not service
