@@ -281,6 +281,9 @@
               " --destination FILE destination, mandatory for --dashboards/ --thresholds\n")))
 
 (defn do-export-dashboards [{:keys [destination]}]
+  (when-not destination
+    (throw+ {:type :option-missing :hint "destination"}))
+
   (let [file-path (partial file-path destination)]
     (doall
     ; main templates
@@ -309,6 +312,8 @@
           apps))))
 
 (defn do-export-thresholds [{:keys [destination]}]
+  (when-not destination
+    (throw+ {:type :option-missing :hint "destination"}))
   (->> apps
        (map (fn [[long short cmds]]
               (hystrix-thresholds long cmds (str long "_remote"))))
@@ -326,10 +331,12 @@
        (do
          (errorf "CMD %s is unknown" cmd)
          (println-help))))
+   (catch [:type :option-missing] {:keys [hint]}
+     (errorf "Option `%s` is missing" hint))
    (catch Object _
      (error "An unknown error occured" &throw-context)))
-    ; hack to make the clj program quit
-  #_(java.lang.System/exit 0))
+  ; hack to make the clj program quit
+  (java.lang.System/exit 0))
 
 #_(-main "--thresholds" "--destination" "/Users/i303874/Desktop/ops/riemann-dashboard/bin/etc/thresholds.clj")
 #_(-main "--dashboards" "--destination" "/Users/i303874/Desktop/ops/riemann-dashboard/bin/etc/")
