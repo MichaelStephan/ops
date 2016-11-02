@@ -1,8 +1,5 @@
 package some.webapp.api;
 
-import com.codahale.metrics.annotation.ExceptionMetered;
-import com.codahale.metrics.annotation.Metered;
-import com.codahale.metrics.annotation.Timed;
 import some.webapp.service.SimulatorService;
 
 import javax.inject.Singleton;

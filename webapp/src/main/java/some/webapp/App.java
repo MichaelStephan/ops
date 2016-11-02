@@ -1,8 +1,8 @@
 package some.webapp;
 
 import com.codahale.metrics.*;
-import com.codahale.metrics.jersey2.InstrumentedResourceMethodApplicationListener;
-import yaas.io.framework.MetricsFramework;
+import io.yaas.monitoring.framework.MetricsFramework;
+import io.yaas.monitoring.servlet.filter.MetricsServletFilter;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -10,7 +10,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import some.webapp.api.SimulatorAPI;
 import some.webapp.service.SimulatorService;
-import yaas.io.servlet.filter.MetricsServletFilter;
 
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
@@ -22,6 +21,7 @@ import java.util.EnumSet;
 public class App {
     public static void main(String[] args) {
         MetricsFramework metricsFramework = MetricsFramework.getInstance();
+
 
         /* metrics configuration */
         MetricRegistry registry = new MetricRegistry();
@@ -35,9 +35,9 @@ public class App {
         context.setContextPath("/");
         context.addServlet(new ServletHolder(new ServletContainer(resourceConfig)), "/*");
         context.addFilter(MetricsServletFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
-        resourceConfig.register(new InstrumentedResourceMethodApplicationListener(metricsFramework.getMetricsRegistry()));
+        resourceConfig.register(new MetricsServletFilter());
 
-        metricsFramework.start();
+        metricsFramework.startInternal();
 
         /* server configuration */
         Server server = new Server(6666);
