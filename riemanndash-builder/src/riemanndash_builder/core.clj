@@ -222,6 +222,7 @@
                                                          :title (str short-name " http 5xx")
                                                          :timeRange 900
                                                          :weight 4
+                                                         :graphType "bar"
                                                          :query (str "(service = \"" long-name " javax.servlet.Filter.5xx-responses count_dt\") and (host = nil)"))))
                                            (hstack-template
                                             :weight 2
@@ -230,6 +231,7 @@
                                                          :title (str short-name " appender errors")
                                                          :timeRange 900
                                                          :weight 4
+                                                         :graphType "bar"
                                                          :query (str "(service = \"" long-name " ch.qos.logback.core.Appender.error count_dt\") and (host = nil)"))))
                                            (hstack-template
                                             :weight 2
@@ -238,6 +240,7 @@
                                                          :title (str short-name " hystrix errors")
                                                          :timeRange 900
                                                          :weight 4
+                                                         :graphType "bar"
                                                          :query (str "(service =~ \"" long-name "_remote hystrix.HystrixCommand%countFailure%_dt\") and (host = nil)"))))]))}]))
 
 (defn main-hystrix-cmds-template [app-name app-short-name cmds]
