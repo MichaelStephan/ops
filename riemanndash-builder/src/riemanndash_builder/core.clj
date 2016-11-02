@@ -241,7 +241,7 @@
                                                          :timeRange 900
                                                          :weight 4
                                                          :graphType "bar"
-                                                         :query (str "(service =~ \"" long-name "_remote hystrix.HystrixCommand%countFailure%_dt\") and (host = nil)"))))]))}]))
+                                                         :query (str "(service =~ \"" long-name " hystrix.HystrixCommand.countFailure_dt\") and (host = nil)"))))]))}]))
 
 (defn main-hystrix-cmds-template [app-name app-short-name cmds]
   (dash-template
