@@ -210,6 +210,36 @@
                                 (maintenance-template)
                                 (health-template)]))))
 
+(defn main-error-template [apps]
+  (dash-template
+   :workspaces [{:name "errors"
+                 :view (baloon-template
+                        :child (vstack-template
+                                :children [(hstack-template
+                                            :weight 2
+                                            :children (for [[long-name short-name _] apps]
+                                                        (flot-template
+                                                         :title (str short-name " http 5xx")
+                                                         :timeRange 900
+                                                         :weight 4
+                                                         :query (str "(service = \"" long-name " javax.servlet.Filter.5xx-responses count_dt\") and (host = nil)"))))
+                                           (hstack-template
+                                            :weight 2
+                                            :children (for [[long-name short-name _] apps]
+                                                        (flot-template
+                                                         :title (str short-name " appender errors")
+                                                         :timeRange 900
+                                                         :weight 4
+                                                         :query (str "(service = \"" long-name " ch.qos.logback.core.Appender.error count_dt\") and (host = nil)"))))
+                                           (hstack-template
+                                            :weight 2
+                                            :children (for [[long-name short-name _] apps]
+                                                        (flot-template
+                                                         :title (str short-name " hystrix errors")
+                                                         :timeRange 900
+                                                         :weight 4
+                                                         :query (str "(service =~ \"" long-name "_remote hystrix.HystrixCommand%countFailure%_dt\") and (host = nil)"))))]))}]))
+
 (defn main-hystrix-cmds-template [app-name app-short-name cmds]
   (dash-template
    :workspaces (remove nil?
@@ -297,7 +327,7 @@
               (->> (config-rb config-name)
                    (spit (file-path (str short "-config.rb"))))))
           apps))
-  ; main hystrix templates
+    ; main hystrix templates
     (doall
      (map (fn [[long short cmds :as app]]
             (let [config-name (str short "-hys-config.json")]
@@ -309,7 +339,10 @@
               (->>
                (config-rb config-name)
                (spit (file-path (str short "-hys-config.rb"))))))
-          apps))))
+          apps))
+    (let [config-name "err-config.json"]
+      (spit (file-path "err-config.rb") (config-rb config-name))
+      (spit (file-path config-name) (-> (main-error-template apps) (json/write-str))))))
 
 (defn do-export-thresholds [{:keys [destination]}]
   (when-not destination
@@ -336,7 +369,7 @@
    (catch Object _
      (error "An unknown error occured" &throw-context)))
   ; hack to make the clj program quit
-  (java.lang.System/exit 0))
+  #_(java.lang.System/exit 0))
 
 #_(-main "--thresholds" "--destination" "/Users/i303874/Desktop/ops/riemann-dashboard/bin/etc/thresholds.clj")
-#_(-main "--dashboards" "--destination" "/Users/i303874/Desktop/ops/riemann-dashboard/bin/etc/")
+(-main "--dashboards" "--destination" "/Users/i303874/Desktop/ops/riemann-dashboard/bin/etc/")
