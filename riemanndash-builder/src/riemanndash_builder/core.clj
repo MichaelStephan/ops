@@ -221,7 +221,7 @@
                                                         (flot-template
                                                          :title (str short-name " http 5xx")
                                                          :timeRange 900
-                                                         :weight 4
+                                                         :weight 3
                                                          :graphType "bar"
                                                          :query (str "(service = \"" long-name " javax.servlet.Filter.5xx-responses count_dt\") and (host = nil)"))))
                                            (hstack-template
@@ -230,7 +230,7 @@
                                                         (flot-template
                                                          :title (str short-name " appender errors")
                                                          :timeRange 900
-                                                         :weight 4
+                                                         :weight 3
                                                          :graphType "bar"
                                                          :query (str "(service = \"" long-name " ch.qos.logback.core.Appender.error count_dt\") and (host = nil)"))))
                                            (hstack-template
@@ -239,9 +239,18 @@
                                                         (flot-template
                                                          :title (str short-name " hystrix errors")
                                                          :timeRange 900
-                                                         :weight 4
+                                                         :weight 3
                                                          :graphType "bar"
-                                                         :query (str "(service =~ \"" long-name "_remote hystrix.HystrixCommand%countFailure%_dt\") and (host = nil)"))))]))}]))
+                                                         :query (str "(service =~ \"" long-name " hystrix.HystrixCommand.countFailure_dt\") and (host = nil)"))))
+                                           (hstack-template
+                                            :weight 2
+                                            :children [(flot-template
+                                                        :title "app health"
+                                                        :timeRange (* 6 60 60)
+                                                        :weight 3
+                                                        :graphType "line"
+                                                        :stackMode "true"
+                                                        :query "(service =~ \"%-health\") and (host = nil)")])]))}]))
 
 (defn main-hystrix-cmds-template [app-name app-short-name cmds]
   (dash-template
